@@ -169,7 +169,7 @@ if(!call.hidden){
 //해당함수가 호출 후 백엔드에서 호출(emit)되어졌을 때(다른쪽 브라우저와 연결할때 사용, 서버통신)
 socket.on("welcome", (nickname, newCount)=>{
     addmessage(`${nickname} 님이 들어오셨습니다🎉 반갑게 인사해주세요!!`);
-    h3.innerText = `Room ${roomname} (${newCount}) `; 
+    h3.innerText = `Room ${roomname} (${newCount}) `;
 });
 
 socket.on("bye", (nick,newCount)=>{
