@@ -1,0 +1,37 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title SooooMa
+        link(rel="stylesheet", href="https://unpkg.com/mvp.css@1.7.4/mvp.css")
+    body
+        header
+            h1 SooooMa
+        main
+            h3#roomname
+            div#call
+                div
+                    video#myface(autoplay, playsinline,)
+                    br
+                    button#mute
+                        i.fa(aria-hidden='true')
+                    button#camera
+                        i.fa(aria-hidden='true')
+                    select#cameras
+            div#welcome
+                form
+                    input( type="text", placeholder="room name", required )#roomname_input
+                    input( type="text", placeholder="nick name", required )#nickname_input
+                    button Enter Room
+                h4 Open Room
+                ul
+            div#room
+                textarea.form-control(readonly='')#chatlog
+                form
+                    input( type="text", placeholder="message", required )
+                    button Send
+        script(src="/socket.io/socket.io.js")
+        script(src="/public/js/applical.js")
+        script(src="https://kit.fontawesome.com/94b3501aec.js", crossorigin="anonymous")
