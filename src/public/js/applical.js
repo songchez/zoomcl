@@ -24,8 +24,8 @@ let muted = false;
 let cameraoff = false;
 let mypeerconnection;
 
- //자기자신 비디오
-//카메라셀렉트
+ //내 비디오
+//TODO: 카메라셀렉트
 async function getCameras() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -50,7 +50,7 @@ async function getCameras() {
     }
 }
 
-//비디오 가져오기
+// TODO: 비디오 가져오기
 async function getMedia(deviceId) {
     const initialConstrains = {
         audio : true,
@@ -74,7 +74,7 @@ async function getMedia(deviceId) {
 }
 
 
-//방입장과 메시지 입력!!!!
+//TODO:방입장과 메시지 입력!!!!
 //메시지 입력
 function addmessage(message) {
     const chatlog = room.querySelector("#chatlog");
@@ -93,13 +93,12 @@ function handleMessageSubmit(event) {
 //방 입장_2
 async function initcall() {
     //videostart
-    if(!mediaerror){
-        call.hidden = false;
-        await getMedia();
-        handlemuteclick();
-        handlecameraclick();
-        makeconnection();
-    }
+    //if(!mediaerror){}
+    call.hidden = false;
+    await getMedia();
+    handlemuteclick();
+    handlecameraclick();
+    makeconnection();
     //chatstart
     room.hidden = false;
     welcome.hidden = true;
@@ -129,7 +128,7 @@ async function handleroomsubmit(event) {
 form.addEventListener("submit", handleroomsubmit);
 
 
-//뮤트와 카메라 버튼
+// TODO: 뮤트와 카메라 버튼
 function handlemuteclick() {
     myStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
     if(!muted){
@@ -157,16 +156,21 @@ function handlecameraclick() {
 mutebtn.addEventListener("click", handlemuteclick);
 camerabtn.addEventListener("click", handlecameraclick);
 
-//카메라선택
+//TODO:카메라선택
 async function handlecameraselect() {
     await getMedia(cameraselect.value);
+    if(mypeerconnection){
+        const videotrack = myStream.getVideoTracks()[0]
+        const videosender = mypeerconnection.getSenders().find((sender)=>sender.track === "video");
+    videosender.replaceTrack(videotrack);
+    }
 }
 //왜 실행되는 것일까????
 if(!call.hidden){
     cameraselect.addEventListener("input", handlecameraselect());
 } 
 
-//해당함수가 호출 후 백엔드에서 호출(emit)되어졌을 때(다른쪽 브라우저와 연결할때 사용, 서버통신)
+//TODO:해당함수가 호출 후 백엔드에서 호출(emit)되어졌을 때(다른쪽 브라우저와 연결할때 사용, 서버통신)
 socket.on("welcome", (nickname, newCount)=>{
     addmessage(`${nickname} 님이 들어오셨습니다🎉 반갑게 인사해주세요!!`);
     h3.innerText = `Room ${roomname} (${newCount}) `;
@@ -201,19 +205,39 @@ socket.on("welcome_2", async ()=>{
 
 //받기.(다른함수,백엔드에서 실행)
 socket.on("offer", async offer =>{
+    console.log("received the offer");
     mypeerconnection.setRemoteDescription(offer);
     const answer = await mypeerconnection.createAnswer();
     mypeerconnection.setLocalDescription(answer);
     socket.emit("answer", answer, roomname);
+    console.log("sent the answer");
 })
 socket.on("answer", answer=>{
+    console.log("received the answer");
     mypeerconnection.setRemoteDescription(answer);
+})
+
+//icecadidate
+socket.on("ice", ice=>{
+    console.log("receive the ICE");
+    mypeerconnection.addIceCandidate(ice);
 })
 
 function makeconnection() {
     mypeerconnection = new RTCPeerConnection();
+    mypeerconnection.addEventListener("icecandidate", handleice)
+    mypeerconnection.addEventListener("addstream", handleaddstream)
     myStream.getTracks().forEach(tracks =>{
         mypeerconnection.addTrack(tracks, myStream);        
     });
 }
 
+function handleice(data) {
+    socket.emit("ice", data.candiate, roomname);
+    console.log("sent cadidate");
+}
+function handleaddstream(data) {
+    const peerstream = document.getElementById("peerface");
+    peerstream.srcObject =data.stream;
+    console.log("peer connection complite");
+}
