@@ -18,9 +18,11 @@
     "express": "^4.17.1",
     "http": "0.0.1-security",
     "javascript": "^1.0.0",
+    "localtunnel": "^2.0.1",
     "npm": "^7.20.6",
     "pug": "^3.0.2",
     "socket.io": "^4.1.3",
+    "webrtc": "^1.14.1",
     "ws": "^8.0.0"
   }
 }

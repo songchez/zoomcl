@@ -13,14 +13,15 @@ html(lang="en")
             h3#roomname
             div#call
                 div
-                    video#myface(autoplay, playsinline,)
+                    video#myface(autoplay, playsinline)
+                    video#peerface(autoplay, playsinline)
                     br
                     button#mute
                         i.fa(aria-hidden='true')
                     button#camera
                         i.fa(aria-hidden='true')
                     select#cameras
-                video#peerface(autoplay, playsinline,)
+                    
             div#welcome
                 form
                     input( type="text", placeholder="room name", required )#roomname_input

@@ -9,6 +9,7 @@ const camerabtn = document.getElementById("camera");
 const camerabtnicon = camerabtn.querySelector("i")
 const cameraselect = document.getElementById("cameras");
 const call = document.getElementById("call");
+const peerface = document.getElementById("peerface");
 
 //default(숨김)
 room.hidden = true;
@@ -204,31 +205,44 @@ socket.on("welcome_2", async ()=>{
 });
 
 //받기.(다른함수,백엔드에서 실행)
-socket.on("offer", async offer =>{
+socket.on("offer", async (offer) =>{
     console.log("received the offer");
     mypeerconnection.setRemoteDescription(offer);
     const answer = await mypeerconnection.createAnswer();
     mypeerconnection.setLocalDescription(answer);
     socket.emit("answer", answer, roomname);
     console.log("sent the answer");
-})
-socket.on("answer", answer=>{
+});
+
+socket.on("answer", (answer)=>{
     console.log("received the answer");
     mypeerconnection.setRemoteDescription(answer);
-})
+});
 
 //icecadidate
-socket.on("ice", ice=>{
+socket.on("ice", (ice)=>{
     console.log("receive the ICE");
     mypeerconnection.addIceCandidate(ice);
-})
+});
 
 function makeconnection() {
-    mypeerconnection = new RTCPeerConnection();
-    mypeerconnection.addEventListener("icecandidate", handleice)
-    mypeerconnection.addEventListener("addstream", handleaddstream)
-    myStream.getTracks().forEach(tracks =>{
-        mypeerconnection.addTrack(tracks, myStream);        
+    mypeerconnection = new RTCPeerConnection({
+        iceServers: [
+            {
+              urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302",
+                "stun:stun2.l.google.com:19302",
+                "stun:stun3.l.google.com:19302",
+                "stun:stun4.l.google.com:19302",
+              ],
+            },
+        ],
+    });
+    mypeerconnection.addEventListener("icecandidate", handleice);
+    mypeerconnection.addEventListener("addstream", handleaddstream);
+    myStream.getTracks().forEach((track) =>{
+        mypeerconnection.addTrack(track, myStream);        
     });
 }
 
@@ -236,8 +250,10 @@ function handleice(data) {
     socket.emit("ice", data.candiate, roomname);
     console.log("sent cadidate");
 }
+
 function handleaddstream(data) {
-    const peerstream = document.getElementById("peerface");
-    peerstream.srcObject =data.stream;
-    console.log("peer connection complite");
+    //왜 안됄까요....
+    peerface.srcObject = data.stream;
+    console.log(data.stream);
+    console.log(myStream);
 }
